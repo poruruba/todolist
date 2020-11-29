@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src * 'unsafe-inline'; media-src *; img-src * data: content: blob:;">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="css/start.css">
+  <script src="js/methods_bootstrap.js"></script>
+  <script src="js/components_bootstrap.js"></script>
+  <script src="js/vue_utils.js"></script>
+
+  <script src="dist/js/vconsole.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <link rel="manifest" href="manifest.json">
+
+  <title>やることリスト</title>
+</head>
+
+<body>
+  <div id="top" class="container">
+    <button class="btn btn-default btn-sm pull-right" v-on:click="set_apikey">API Key</button>
+    <h1>やることリスト</h1>
+    <div class="row">
+      <div class="col-xs-10">
+        <span v-if="view_mode=='today'">
+          <h3>今日 <span class="badge">{{todo_list_today.length}}件</span></h3>
+          <table class="table table-striped">
+            <tbody>
+              <tr v-for="(value, index) in todo_list_today">
+                <td><a v-on:click="show_view_dialog(value)"><strong class="lead">{{value.content}}</strong></a></td>
+                <td>{{toDateTimeString(value.due)}}</td>
+                <td>{{toProjectName(value.project_id)}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </span>
+
+        <span v-if="view_mode=='other'">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="panel-title"><a data-toggle="collapse" href="#expire_panel">期限切れ</a> <span class="badge">{{todo_list_expire.length}}件</span></div>
+            </div>
+            <div class="panel-collapse collapse" id="expire_panel">
+              <div class="panel-body">
+                <table class="table table-striped">
+                  <tbody>
+                    <tr v-for="(value, index) in todo_list_expire">
+                      <td><a v-on:click="show_view_dialog(value)" class="lead"><strong>{{value.content}}</strong></a></td>
+                      <td>{{toDateTimeString(value.due)}}</td>
+                      <td>{{toProjectName(value.project_id)}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="panel-title"><a data-toggle="collapse" href="#other_panel">明日以降</a> <span class="badge">{{todo_list_other.length}}件</span></div>
+            </div>
+            <div class="panel-collapse collapse" id="other_panel">
+              <div class="panel-body">
+                <table class="table table-striped">
+                  <tbody>
+                    <tr v-for="(value, index) in todo_list_other">
+                      <td><a v-on:click="show_view_dialog(value)"><strong class="lead">{{value.content}}</strong></a></td>
+                      <td>{{toDateTimeString(value.due)}}</td>
+                      <td>{{toProjectName(value.project_id)}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <div class="panel-title"><a data-toggle="collapse" href="#someday_panel">いつか</a> <span class="badge">{{todo_list_someday.length}}件</span></div>
+            </div>
+            <div class="panel-collapse collapse" id="someday_panel">
+              <div class="panel-body">
+                <table class="table table-striped">
+                  <tbody>
+                    <tr v-for="(value, index) in todo_list_someday">
+                      <td><a v-on:click="show_view_dialog(value)"><strong class="lead">{{value.content}}</strong></a></td>
+                      <td>{{toDateTimeString(value.due)}}</td>
+                      <td>{{toProjectName(value.project_id)}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </span>
+      </div>
+      <div class="col-xs-2">
+        <span class="badge">{{todo_list_today.length}}件</span><br>
+        <button class="btn btn-default btn-lg btn-block" v-on:click="view_mode='today'">今日</button><br>
+        <span class="badge">{{todo_list_expire.length + todo_list_other.length + todo_list_someday.length}}件</span><br>
+        <button class="btn btn-default btn-lg btn-block" v-on:click="view_mode='other'">その他</button>
+      </div>
+    </div>
+
+
+    <modal-dialog id="view_dialog" size="lg">
+      <div slot="content">
+        <div class="modal-header">
+          <h4>やることの表示</h4>
+        </div>
+        <div class="modal-body">
+          <span v-if="target">
+            <label>content</label> {{target.content}}<br>
+            <label>dueDate</label> {{toDateTimeString(target.due)}}<br>
+            <label>project</label> {{toProjectName(target.project_id)}}<br>
+            <span v-if="hasNotes(target.id)">
+              <label>note</label><textarea class="form-control" readonly>{{getNotes(target.id)}}</textarea>
+            </span>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-default" v-on:click="dialog_close('#view_dialog')">閉じる</button>
+        </div>
+      </div>
+    </modal-dialog>
+
+
+    <!-- for progress-dialog -->
+    <progress-dialog v-bind:title="progress_title"></progress-dialog>
+  </div>
+
+  <script src="js/start.js"></script>
+</body>
