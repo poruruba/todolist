@@ -5,8 +5,8 @@ const Response = require(HELPER_BASE + 'response');
 
 const FILE_BASE = './data/todoist/';
 
-const TODOIST_CLIENT_ID = "ÅytodoistÇÃClient IDÅz";
-const TODOIST_CLIENT_SECRET = "ÅytodoistÇÃClient secretÅz";
+const TODOIST_CLIENT_ID = "„Äêtodoist„ÅÆClient ID„Äë";
+const TODOIST_CLIENT_SECRET = "„Äêtodoist„ÅÆClient secret„Äë";
 
 const { URL, URLSearchParams } = require('url');
 const fetch = require('node-fetch');
